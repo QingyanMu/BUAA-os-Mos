@@ -1,0 +1,58 @@
+:set encoding=utf-8
+
+lab3上机
+lab3-1
+exam
+PART1
+在今天的实验里我们要求你实现一个简易的 fork 函数（并不包括实际load代码段），通过给定的原始进程块(输入参数struct Env *e)生成一个新的进程控制块，并返回新进程控制块的env_id。同学们需要在 lib/env.c 和 include/env.h 中分别定义和声明 fork 函数，函数接口如下： u_int fork(struct Env *e); 要求如下：
+
+从 env_free_list 中从头申请一个新的进程控制块
+新进程控制块的 env_status、env_pgdir、env_cr3、env_pri和原进程控制块保持一致。
+为新进程控制块生成对应的 env_id
+env_parent_id 的值为原进程控制块的 env_id
+返回值为新进程的env_id
+PART2
+void lab3_output(u_int env_id);
+
+本部分要求修改struct Env，在进程控制块中增加字段（具体增加哪些内容请自行组织）组织起进程间的父子、兄弟关系，并按照要求在 lib/env.c 和 include/env.h 中分别定义和声明 lab3_output 函数输出相关内容，详情如下： 函数lab3_output的定义如下： void lab3_output(u_int env_id); 要求输出的内容有其父进程的env_id、其第一个子进程的env_id、其前一个兄弟进程的env_id以及其后一个兄弟进程的env_id 所有的子进程都由fork创建，两个进程如果是兄弟，它们的父进程一定相同。 以某进程第一个子进程是指，由该进程作为父进程使用fork创建的第一个子进程。 兄弟进程间的顺序即为这些进程被创建的顺序，前一个兄弟进程为较早被创建的进程 需要在PART1的fork函数中进行对添加字段的修改 输出格式为：printf("%08x %08x %08x %08x\n", a, b, c, d); 其中a, b, c, d分别为父进程的env_id、第一个子进程的env_id、前一个兄弟进程的env_id以及后一个兄弟进程的env_id 如果a, b, c, d中有不存在的参数，则输出0
+
+PART3
+在PART2的基础上，在 lib/env.c 和 include/env.h 中分别定义和声明 lab3_get_sum 函数，函数的功能为：给定一个进程的env_id，返回以该进程为根节点的子进程树中进程的数目（包括它本身），具体接口如下： int lab3_get_sum(u_int env_id);
+
+解答
+比较简单，但是小坑不断。有的人第一题没有用env_alloc()结果忘记给free_env_listremove掉分配的env
+
+斗胆放上自己的代码。
+
+首先是修改env结构体，这次exam用数组写起来比较简单。为什么我没用链表呢，因为C语言功底太差，，用指针怕错。。。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Extra
+题目
+b/env.c 和 include/env.h 中分别定义和声明 lab3_kill 函数，功能为：杀死一个进程。进程树的根节点代表的进程收养（接管）他的孤儿进程。这些孤儿进程将依次排列在根进程的子进程的尾部。测试中保证不会杀死根节点代表的进程。函数接口如下： void lab3_kill(u_int env_id); 在完成一次删除后，基础测试PART2 lab3_output，输出的结果在新的树结构下仍应正确。 一颗进程树的根节点代表的进程由env_alloc创建，其余节点代表的进程皆由PART1 fork创建。 本部分中“杀死进程”的要清空进程控制块相关字段（可以参考free_env()，但是不能调用free_env()）以及其他相关处部分测试较强，请务必考虑完善。
+
+解答
+一堆人以为自己的数据结构出问题了，结果，，是在杀死一个进程后的状态处理上出问题了。
+
+我一push，得11分，呵呵，也跑去de自己结构的bug了，不过已经没时间了。
+
+早知道exam拿60分就跑路了，现在发现原来exam60和100最终得分没差。麻了，战术失误。
+
+
